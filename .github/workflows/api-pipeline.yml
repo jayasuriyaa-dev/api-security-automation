@@ -11,10 +11,10 @@ jobs:
     
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3 # This copies your Postman files to the server
+        uses: actions/upload-artifact@v4 # This copies your Postman files to the server
         
       - name: Install Node.js Engine
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '20' # Just like what you installed today!
           
@@ -31,7 +31,7 @@ jobs:
           -r htmlextra
           
       - name: Upload the Executive Dashboard
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always() # Uploads the report even if the tests fail
         with:
           name: Newman-Dashboard
