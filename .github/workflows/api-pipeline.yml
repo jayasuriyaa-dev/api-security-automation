@@ -1,0 +1,38 @@
+name: Automated API Security Fuzzing
+
+on: 
+  push:
+    branches:
+      - main  # This tells the cloud to run the test every time new code is pushed!
+
+jobs:
+  run-api-tests:
+    runs-on: ubuntu-latest # We are renting a temporary Linux server from GitHub
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3 # This copies your Postman files to the server
+        
+      - name: Install Node.js Engine
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20' # Just like what you installed today!
+          
+      - name: Install Newman and HTML Reporter
+        run: |
+          npm install -g newman
+          npm install -g newman-reporter-htmlextra
+          
+      - name: Fire the Newman Barrage
+        run: >
+          newman run QA_Collection.json 
+          -e QA_Environment.json 
+          -d ai_fuzzing_data.json 
+          -r htmlextra
+          
+      - name: Upload the Executive Dashboard
+        uses: actions/upload-artifact@v3
+        if: always() # Uploads the report even if the tests fail
+        with:
+          name: Newman-Dashboard
+          path: newman/
