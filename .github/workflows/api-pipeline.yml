@@ -3,20 +3,20 @@ name: Automated API Security Fuzzing
 on: 
   push:
     branches:
-      - main  # This tells the cloud to run the test every time new code is pushed!
+      - main
 
 jobs:
   run-api-tests:
-    runs-on: ubuntu-latest # We are renting a temporary Linux server from GitHub
+    runs-on: ubuntu-latest
     
     steps:
       - name: Checkout Repository
-        uses: actions/upload-artifact@v4 # This copies your Postman files to the server
+        uses: actions/checkout@v4
         
       - name: Install Node.js Engine
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # Just like what you installed today!
+          node-version: '20'
           
       - name: Install Newman and HTML Reporter
         run: |
@@ -32,7 +32,7 @@ jobs:
           
       - name: Upload the Executive Dashboard
         uses: actions/upload-artifact@v4
-        if: always() # Uploads the report even if the tests fail
+        if: always()
         with:
           name: Newman-Dashboard
           path: newman/
