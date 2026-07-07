@@ -31,7 +31,15 @@ jobs:
           -e QA_Environment.json 
           -d ai_fuzzing_data.json 
           -r htmlextra
-          
+
+          - name: Fire Discord Alert on Failure
+        if: failure()
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          curl -H "Content-Type: application/json" \
+          -d '{"content": "🚨 **SECURITY ALERT:** API Fuzzing Pipeline caught a vulnerability! Check the GitHub Actions dashboard immediately."}' \
+          $DISCORD_WEBHOOK
       - name: Upload the Executive Dashboard
         uses: actions/upload-artifact@v4
         if: always()
