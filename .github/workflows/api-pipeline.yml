@@ -1,48 +1,49 @@
 name: Automated API Security Fuzzing
 
-on: 
+on:
   push:
     branches:
       - main
   schedule:
-    - cron: '0 0 * * *' # This tells the server to run at Midnight (00:00) UTC every day
+    - cron: '0 0 * * *'
 
 jobs:
   run-api-tests:
     runs-on: ubuntu-latest
-    
+
     steps:
-      - name: Checkout Repository
+      - name: Checkout Code
         uses: actions/checkout@v4
-        
-      - name: Install Node.js Engine
+
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          
-      - name: Install Newman and HTML Reporter
+
+      - name: Install Newman and HTMLExtra
         run: |
           npm install -g newman
           npm install -g newman-reporter-htmlextra
-          
-      - name: Fire the Newman Barrage
-        run: >
-          newman run QA_Collection.json 
-          -e QA_Environment.json 
-          -d ai_fuzzing_data.json 
-          -r htmlextra
 
-          - name: Fire Discord Alert on Failure
-        if: failure()
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-          run: |
-          curl -H "Content-Type: application/json" \
-          -d '{"content": "🚨 **SECURITY ALERT:** API Fuzzing Pipeline caught a vulnerability! Check the GitHub Actions dashboard immediately."}' \
-          $DISCORD_WEBHOOK
-      - name: Upload the Executive Dashboard
+      - name: Execute Fuzzing Payload
+        run: |
+          newman run QA_Collection.json \
+          -e QA_Environment.json \
+          -d ai_fuzzing_data.json \
+          -r cli,htmlextra
+
+      - name: Upload Executive Dashboard
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: Newman-Dashboard
           path: newman/
+
+      - name: Fire Discord Alert on Failure
+        if: failure()
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          curl -H "Content-Type: application/json" \
+          -d '{"content": "🚨 **SECURITY ALERT:** API Fuzzing Pipeline caught a vulnerability! Check the GitHub Actions dashboard immediately."}' \
+          $DISCORD_WEBHOOK
