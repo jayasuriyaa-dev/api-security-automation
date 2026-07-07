@@ -36,7 +36,7 @@ jobs:
         if: failure()
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-        run: |
+          run: |
           curl -H "Content-Type: application/json" \
           -d '{"content": "🚨 **SECURITY ALERT:** API Fuzzing Pipeline caught a vulnerability! Check the GitHub Actions dashboard immediately."}' \
           $DISCORD_WEBHOOK
